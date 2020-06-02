@@ -1,0 +1,58 @@
+---
+# layout: "post"
+title: "3벌식 코드"
+date: "2017-08-19 01:33"
+# categories: javascript
+tags: Etc
+slug: 3bol
+header:
+  teaser: /assets/images/10.png
+
+---
+## 3벌식 버튼 만드는 예제
+
+```javascript
+{% raw %}
+<script>
+$(document).ready(function(){
+
+   check = true;
+
+    $("#key3").click(function(){
+      if(check){
+        var script = document.createElement("SCRIPT");
+        script.src = '{% static "/askdjango/js/additional_layouts.js"%}';
+        script.type = 'text/javascript';
+        script.setAttribute('id', 'testt');
+        document.getElementsByTagName("head")[0].appendChild(script);
+
+        var script = document.createElement("SCRIPT");
+        script.src = '{% static "/askdjango/js/ohi.js"%}';
+        script.type = 'text/javascript';
+        script.setAttribute('id', 'testt2');
+        document.getElementsByTagName("head")[0].appendChild(script);
+
+      }
+
+        check = false ;
+
+
+
+
+      // var script = document.createElement("SCRIPT");
+      // script.src = '{% static "/askdjango/js/my6.js"%}';
+      // script.type = 'text/javascript';
+      // document.getElementsByTagName("head")[0].appendChild(script);
+
+
+          // your jQuery code here
+
+
+
+
+
+    });
+});
+</script>
+{% endraw %}
+```

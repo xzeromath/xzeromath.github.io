@@ -1,0 +1,25 @@
+---
+# layout: "post"
+title: "주피터노트북 환경설정"
+date: "2018-05-14 22:51"
+# categories: "Computer"
+  #Computer,Python,Math,Django,Javascript,Jupyter Notebook,Excel,TW
+tag: "Jupyter"
+slug: "config-jupyter"
+header:
+  teaser: /assets/images/14.png
+---
+
+## 주피터 환경설정법
+
+1. jupyter kernel은 환경이 py2, py3와는 별도로 설정하는 듯함.
+다음은 py2를 커널에 넣는 과정임.
+ - conda create -n mytest python=2  (환경생성)
+ - source activate mytest (환경활성화)
+ - conda install notebook ipykernel
+ - ipython kernel install --user --name=python2 (커널추가)
+ - conda env list (설치된 환경검색)
+
+2. 환경에 패키지 설치
+ - 위의 활성화된 상태에서 pip를 이용한 생성은 각자의 환경에 모듈를 생성
+ - `module.__file__` 로 설치 위치 확인가능

@@ -1,0 +1,35 @@
+---
+# layout: "post"
+title: "ec2에 ssh접속"
+date: "2018-03-28 22:51"
+# categories: Computer
+  #Computer,Python,Math,Django,Javascript,Jupyter Notebook,Excel,TW
+tag: "AWS"
+slug: "awsssh"
+header:
+  teaser: /assets/images/1.png
+---
+
+1. IAM 계정생성
+- 프로그래밍 방식 접근허용
+2. EC2 생성(아마존 리눅스로 생성)
+- 보안그룹에 http 규칙추가
+3. Key pair 생성
+- .ssh생성
+4. ssh 접속
+ssh -i ***.pem ec2-user@주소
+5. 퍼미션 오류가 발생
+6. ***.pem의 퍼미션 조정
+- chmod 400 mykey.pem
+7. ssh접속 성공(아이디가 ec2-user임)
+8. sudo su
+- passwd 로 root계정의 비밀번호를 설정할 수 있음.
+9.
+- yum update -y
+- yum install httpd -y
+- (파일을 /var/www/html/에 저장함.)
+- wget  https://s3.ap-northeast-2.amazonaws.com/180328-begginer/templated-visualize.zip
+- unzip templated-visualize.zip
+- cd templated-visualize
+- cp -R ./* /var/www/html/
+- service httpd restart

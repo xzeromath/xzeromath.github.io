@@ -1,0 +1,69 @@
+---
+layout: "post"
+title: "EB에 배포 및 세팅분기시 삽질"
+date: "2018-01-16 16:46"
+# categories: "Django"
+  #Computer,Python,Math,Django,Javascript,Jupyter Notebook,Excel,TW
+slug: "ebsettings"
+tag: Django
+header:
+  teaser: /assets/images/20.png
+
+---
+
+## EB에 오랜만에 배포하면서 했던 삽질
+
+1. 우선 eb deploy에서 request 버젼 에러
+  - pip uninstall awsebcli 후 brew install awsebcli 로 설치하니까 되었음
+
+2. 루트 디렉토리에 .ebextensions/django.config 를 만든다.
+
+내용은
+{% highlight python %}
+container_commands:
+  01_migrate:
+    command: "python manage.py migrate"
+  02_collectstatic:
+    command: "python manage.py collectstatic --noinput"
+  03_createsu:
+    command: "python manage.py createsu"
+    leader_only: true
+
+option_settings:
+  aws:elasticbeanstalk:container:python:
+    WSGIPath: mysite/wsgi.py
+
+{% endhighlight %}
+
+이다. 물론 위에서 프로젝트명 등은 적당히 변경
+
+
+3. 적당한앱/management/commands/createsu.py 를 만든다.
+{% highlight python %}
+from django.core.management.base import BaseCommand
+from django.contrib.auth.models import User
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        if not User.objects.filter(username="admin").exists():
+            User.objects.create_superuser("admin","id@gmail.com","password")
+{% endhighlight %}
+- 이를 통해 어드민 계정을 생성할 수 있다.
+
+4. 세팅분기시 삽질
+- common.py에 BASE_DIR 의 깊이 변경
+- manage.py에  os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings.dev") 로 변경, 이를 통해 최초 시작시 세팅을 dev로 설정
+- wsgi.py에 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings.aws_prod") 설정, 이를 통해 배포했을때 세팅설정
+
+
+5. eb cli시 삽질
+- 계정을 새로 팠는데 전에 계정으로 계속 연결됨
+- .aws에 키와 아이디가 기록되어 있는데 이를 바탕으로 eb cli를 연결함!
+- rds설정시 인바운드를 postgre 로 잘 설정함. 포트번호도!!
+- S3의 버킷을 생성해놓고 이를 연결해야함.
+- 버킷은 읽을 수 있는 권한을 everyone(실험해볼 필요있음.)
+- eb setenv key=value/ 를 통해 여러줄 입력하여 환경변수 생성
+- 파이썬 위치에 해당하는 환경변수는 자동으로 생기는 듯?
+
+6. 기타
+- 배포후 elastic ip 가 잘 설정되지 않았다.
+- 구성,확장에서 환경유형을 단일 인스턴스로 하면 자동적으로 EIP가 생긴다.!!

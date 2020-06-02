@@ -1,0 +1,76 @@
+---
+layout: "post"
+title: "ajax를 사용한 폼 입력"
+date: "2018-01-10 10:54"
+# categories: "Django"
+  #Computer,Python,Math,Django,Javascript,Jupyter Notebook,Excel,TW
+slug: "ajax_with_django"
+tag: Django
+header:
+  teaser: /assets/images/18.png
+
+---
+
+## ajax에서 csrf_token 문제
+- 폼입력에서 가장 해결하기 힘들었던 부분이 csrf_token이다.
+- 이 부분을 [여기](https://simpleisbetterthancomplex.com/tutorial/2016/11/15/how-to-implement-a-crud-using-ajax-and-json.html)를 참고하여 해결하였다.
+
+{% highlight python %}
+def create(request):
+    data={}
+    post = Post.objects.all()
+
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        print("post방식 접근")
+        if form.is_valid():
+            form.save()
+            # data['form_is_valid'] = True
+            data['html_book_list'] = render_to_string('blog/form_re.html',{'form':form},request=request)
+        return JsonResponse(data)
+    else:
+        print("get접근")
+        form = PostForm()
+        # data['form_is_valid'] = True
+        data['html_book_list'] = render_to_string('blog/form_re.html',{'form':form},request=request)
+    return JsonResponse(data)
+{% endhighlight %}
+
+- render_to_string 은 render와 비슷하다. 만들어진 내용을 string으로 반환하여 준다. 이를 json형식으로 담는다.
+- 이때 request=request 를 옵션으로 붙이면 폼에 있는 csrf_token을 함께 넘긴다. 이때 템플릿에 포함된 ajax요청은 다음과 같다.
+
+{% highlight python %}
+<script type="text/javascript">
+      $(function(){
+        $("#member").on("click",function(){
+          var form = $(this);
+          // $.ajaxSetup({
+          //   headers: {"X-CSRFToken":'{{csrf_token}}'}
+          // });  // 이 부분은 반드시 필요,없으면 403 에러 발생
+          $.ajax({
+            url: '/blog/create',
+            // data: form.serialize(), 그냥 접속만 하면 되므로 특별히 전달할 데이터 없음.
+            type: 'get',
+            dataType: 'json',
+            beforeSend: function(){
+              $("#modal-book").modal("show");
+            },
+            success: function(data){
+              $("#modal-book .modal-content").html(data.html_book_list);
+            }
+          });
+    return false;
+        });
+
+      });
+
+    </script>
+{% endhighlight %}
+- 이때, request=request 옵션대신 템플릿에서
+```
+$.ajaxSetup({
+headers: {"X-CSRFToken":'{{csrf_token}}'}
+ })
+ ```
+ 을 적용하면 토큰이 넘어가기도 한다.
+ - 하지만 request=request 방식이 좋은 듯하다.

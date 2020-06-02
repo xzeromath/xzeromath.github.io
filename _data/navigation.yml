@@ -1,0 +1,8 @@
+# main links
+main:
+  - title: "Tag"
+    url: /tags/
+  - title: "Project"
+    url: /categories/
+  - title: "Archive"
+    url: /archive/

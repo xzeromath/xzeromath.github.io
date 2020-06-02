@@ -1,0 +1,95 @@
+---
+# layout: "post"
+title: "Html form"
+date: "2017-07-21 09:11"
+# categories: Django
+tag: Django
+slug: html-form
+---
+## 몇가지 fact
+- 하나의 form 태그는 하나 이상의 [위젯](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/The_native_form_widgets)을 가진다.
+- Middleware는 view함수의 함,뒤에서 실행됨.(csrf_token이 한 예)
+-[request.method](https://docs.djangoproject.com/en/1.10/ref/request-response/#quick-overview) 는 "GET,POST" (대문자)로 사용
+- request.GET, request.POST, request.FILES
+- Validator는 모델에 하면 좋음(admin에도 포함됨)
+- form.is_valid()가 참이되면 값들을 사전타입으로 form.cleaned_data에 저장됨.
+
+{%highlight python%}
+     <form action "?lang=ko" method = "post">
+        <input type="text" name="title"/>
+        <textarea name="contents" />
+        <input type="text" name="latlng" />
+     </form>
+{%endhighlight%}
+
+라 하면 post전송에 get인자를 지정해서 보내는 것임.
+
+
+- form.is_valid()를 하면 유효성 검사와 함께 clean data 생성함.
+- (모델폼을 사용했을 경우) comment=form.save(commit=False)를 하면 clean data가 인스턴스에 저장되어 새로운 인스턴스(comment)를 생성. 위에서 commit=False을 생략하면, DB에 저장되는 절차가 부여됨.
+- request.POST['message']보다는 form.cleaned_data['message']와 같이 사용할 것
+- 모델폼에서 수정은 instance=post를 넣어주어야 함.
+
+{%highlight python%}
+#app/models.py
+class Post(models.Model):
+  title = models.CharField(max_length= 100)
+  content = models.TextFiels()
+  created_at = models.DateTimeField(auto_now_add = True)
+  updated_at = models.DateTimeField(auto_now = True)
+
+#app/forms.py
+from django import forms
+class PostForm(forms.Form):
+  title = models.CharField()
+  content = models.CharField(widget=forms.Textarea)
+
+{%endhighlight%}
+
+  - models는 DB에 대한 fields 설명
+  - form은  python에 대한 fields(파이썬은 길이에 따른 구분이 없으므로 같이 쓰면 된다. )
+- form의 유효성 검사가 통과하였을 때 저장방법
+
+{%highlight python%}
+     #방법1
+     post =Post()
+     post.title = form.cleaned_data['title']
+     post.content = form.cleaned_date['content']
+     post.save()
+
+     #방법2
+     post =Post(title= form.cleaned_data['title'], content = form.cleaned_date['content'])
+     post.save()
+
+     #방법3
+     post =Post.objects.create(title= form.cleaned_data['title'], content = form.cleaned_date['content'])
+
+     #방법4
+     post= Post.objects.create(**form.cleaned_data)
+
+{%endhighlight%}
+
+  - 3,4번째 방식은 따로 save()를 호출하지 않아도 됨.
+  - 검증에 실패하면 form.errors와 form.각필드.errors에 정보저장
+
+- 내장 [Validators](https://docs.djangoproject.com/en/1.10/ref/validators/)
+
+- 화면 한쪽으로 쏠릴때
+{%highlight python%}
+     <div class= "container">
+        <div class= "row">
+          <div class= "col-md-12">
+            내용
+          </div>
+        </div>
+     </div>
+{%endhighlight%}
+
+만 해도 어느정도 레이아웃이 이뻐진다.
+
+- nonfield error (특정영역에 속하지 않는 전체적인 오류)
+- 템플릿에서 쓰는 form 마크업 [참고](https://docs.djangoproject.com/en/1.10/topics/forms/#rendering-fields-manually)
+  - for error in form.non_field_errors
+  - form.title.label_tag 등
+
+> [AskDjango](https://nomade.kr) EP18~EP24 form 관련

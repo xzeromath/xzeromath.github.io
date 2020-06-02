@@ -1,0 +1,20 @@
+---
+# layout: "post"
+title: "login form 구현"
+date: "2017-07-10 16:20"
+slug: login-form
+# categories: Python
+tag: Django
+header:
+  teaser: /assets/images/8.png
+---
+
+#Login form
+
+- login 성공후 이동 경로 : settings.LOGIN_REDIRECT_URL
+  - 현재 settings파일에는 없지만 기본적으로 디폴트가 설정되어 있는 것 같음.
+  - 이 파일의 주소를 LOGIN_REDIRECT_URL="test"로 하면 로그인 성공시 /test로 이동하는 것을 알 수 있음.
+
+
+
+> [Askdjango](https://nomade.kr)

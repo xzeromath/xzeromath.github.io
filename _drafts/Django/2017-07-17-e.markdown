@@ -1,0 +1,61 @@
+---
+# layout: "post"
+title: "First django app / Urlconf/ View / Template"
+date: "2017-07-17 09:04"
+slug: ep2
+# categories: Django
+tags: Django
+header:
+  teaser: /assets/images/7.png
+---
+
+ep2, ep3
+
+
+## 프로젝트 및 앱생성 절차
+1. django-admin startproject [프로젝트이름]
+2. mysite(폴더이름)아래에 있는
+mysite(프로젝트이름), db.sqlite3, manage.py ...
+에서 폴더이름은 바꿔도 된다. 하지만 프로젝트이름은 함부로 바꾸면 안된다.
+3. python manage.py --help
+- 여러가지 명령옵션을 확인할 수 있다.
+4. python manage.py startapp blog
+- 필요한 몇개의 디렉토리를 생성함. 지울때는 그냥 삭제해도 됨. 단순히 폴더 만드는 것이기 때문.
+- INSTALLED_APPS 항목에 앱이름 추가할 것
+
+## 템플릿 위치
+- blog/templates/blog/post_list.html 와 같이 위치함
+- 개발서버를 실시할 때 템플릿위치 목록을 최초 수집하여 이후 사용함. 따라서 개발서버를 켜고 나서 템플릿 폴더를 새로만들면 곧바로 반영되지 않을 수 있음.
+
+## 정규표현식
+- [ ] : 특정 한글자를 표현한 것
+- "\d" : 숫자 0회 또는 1회
+- "\d*": 숫자 0회 이상
+- "\d+": 숫자 1회 이상
+- "\d{m}": 숫자 m글자
+- "\d{m,n}": 숫자 m글자 이상 ,n글자 이하
+- re.match(r'^01[016789][1-9]\d{6,7}$,number) (휴대폰번호찾기)
+  - 부합이 되면 해당 글자를 리턴
+  - 부합이 안되면 none을 리턴
+
+## urlconf
+-세팅에 ROOT_URLCONF = 'mysite.urls' : 최상위 urls를 설정함
+-url에서 인자로 넘겨온 것은 str 이다.(숫자라 할지라도)
+
+## 앱성성시 추천작업
+- 앱생성: python manage.py startapp [앱이름]
+- 프로젝트/settings.py에 앱등록
+- 앱이름/urls.py 파일생성
+  {%highlight python%}
+  from django.conf.urls import url
+  urlpatterns=[ ]
+  {%endhighlight%}
+  - 프로젝트/urls.py :앱 urlconf 설정 include
+  {%highlight python%}
+  from django.conf.urls import include, url
+  urlpatterns=[
+  url(r'^앱이름/',include('앱이름.urls', namespace='앱이름')),
+  ]
+  {%endhighlight%}
+
+> AskDjango (https://nomade.kr)

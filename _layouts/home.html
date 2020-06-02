@@ -1,0 +1,16 @@
+---
+layout: archive
+---
+{% include math.html %}
+
+<h3 class="archive__subtitle">{{ site.data.ui-text[site.locale].recent_posts | default: "Recent Posts" }}</h3>
+
+{% for post in paginator.posts %}
+
+
+  <!-- 원래는 archive-single.html 이었음. -->
+  {% include archive-single.html %}
+
+{% endfor %}
+
+{% include paginator.html %}

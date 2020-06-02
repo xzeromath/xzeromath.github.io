@@ -1,0 +1,153 @@
+---
+layout: "post"
+title: "폴더안의 엑셀파일에 특정 매크로를 실행하는 VBA"
+date: "2017-10-13 23:25"
+slug: vba_macro
+categories:
+#   - Excel
+tags:
+- Excel
+header:
+  teaser: /assets/images/16.png
+
+---
+
+## 특정 폴더 안의 파일들
+1. 폴더안의 파일을 돌아다니며 특정 매크로를 실행시키는 파일
+2. 병합된 셀 사이의 특정한 검색어가 포함된 위치를 찾아다니면서 내용을 삭제하는 매크로
+3. 특정 검색어 사이를 돌아다니는 문법이 포함되어 있음
+4. 나이스의 성적파일을 받아서 수업일수와 성적의 일부를 지우는 매크로
+
+{%highlight VBA%}
+Sub allFiles_In_A_Folder2()
+
+Dim strPath As String                             '폴더의 경로를 넣을 변수
+Dim fileName As String                           '각 파일 이름을 넣을 변수
+Dim xlApp As New Excel.Application       '엑셀 프로그램 넣을 변수
+Dim wkBk As Workbook                          '각 파일을 넣을 변수
+Dim wkSht As Worksheet                        '각 시트를 넣을 변수
+
+Dim 표 As Range                               '작업시트선택
+Dim 수업셀 As Range                           '수업일수라고 적힌 셀 개체
+Dim 학부모셀 As Range
+
+Dim 수업지울셀 As Range
+Dim 수업다시지울셀 As Range
+Dim 학부모다시지울셀 As Range
+Dim i As Integer, j As Integer, k As Integer, t As Integer
+
+
+
+    Application.ScreenUpdating = False       '화면 업데이트 (일시) 정지
+
+    With Application.FileDialog(msoFileDialogFolderPicker)  '폴더선택 창에서
+        .Show                                            '폴더 선택창 띄우기
+
+        If .SelectedItems.Count = 0 Then        '취소 선택 시
+            Exit Sub                                      '매크로 종료
+        Else                                               '폴더 선택시
+            strPath = .SelectedItems(1) & "\"   '폴더 경로를 변수에 넣음
+        End If
+    End With
+
+    fileName = Dir(strPath & "*.xls*")            '(폴더내)각 엑셀파일 이름을 변수에 넣음
+
+    If fileName = "" Then                             '폴더에 파일이 없으면
+        MsgBox "폴더에 파일이 없습니다."     '메시지 출력
+        Exit Sub                                          '매크로 중단
+    End If
+
+
+
+    Do While fileName <> ""                        '이름이 없지 않다면, 즉, 엑셀파일이 존재하면
+        Range("a1").Value = fileName
+        Set wkBk = xlApp.Workbooks.Open(strPath & fileName) '파일을 변수에 넣음
+
+
+        For Each wkSht In wkBk.Worksheets  '열린파일 각 시트를 순환
+            Set 표 = wkSht.UsedRange
+            Set 수업셀 = 표.Find("수업") '수업이라는 내용이 있는 셀 선택
+
+            On Error Resume Next
+            '수업셀을 찾아다니면서 내용을 지우는 작업
+            For i = 0 To 17
+                Set 수업지울셀 = 수업셀.Offset(1, 0)
+
+                Set 수업다시지울셀 = 수업지울셀.Resize(1, 40)
+
+                수업다시지울셀.ClearContents
+
+               Set 수업셀 = 표.FindNext(after:=수업셀)
+
+
+            Next i
+
+
+             For j = 0 To 17
+
+                    Set 학부모셀 = 표.Find("학부모")
+
+                    'Debug.Print 학부모셀.Address
+
+                    Set 학부모다시지울셀 = 학부모셀.MergeArea
+
+                    학부모다시지울셀.ClearContents
+
+                    Set 학부모셀 = 표.FindNext(after:=학부모셀)
+                    '학부모셀.Select
+
+             Next j
+
+
+Dim 내용지울셀 As Range
+Dim 내용다시지울셀 As Range
+Dim 내용다시진짜지울셀 As Range
+Dim 점수셀 As Range
+
+            Set 점수셀 = 표.Find("합계")
+
+            For u = 0 To 20
+
+
+            Set 내용지울셀 = 점수셀.MergeArea
+
+            Set 내용다시지울셀 = 내용지울셀.Offset(0, 0)
+
+                For t = 0 To 15
+
+                    For k = 0 To 12
+                        Set 내용다시진짜지울셀 = 내용다시지울셀.MergeArea.Offset(k, t)
+                        내용다시진짜지울셀.MergeArea.ClearContents
+                        'Debug.Print 내용다시지울셀.MergeArea.Offset(k, 0).MergeCells
+                        If Not 내용다시지울셀.MergeArea.Offset(k + 1, t).MergeCells Then
+                        Debug.Print 내용다시지울셀.MergeArea.Offset(k + 1, t).Address
+                        Exit For
+                        End If
+
+
+                    Next k
+
+                Next t
+            Set 점수셀 = 표.FindNext(after:=점수셀)
+
+            Debug.Print 점수셀.Address
+            Next u
+
+
+
+
+
+
+
+        Next wkSht
+        wkBk.Save
+         wkBk.Close                          '열려진 파일을 닫음
+        fileName = Dir                       '다음 파일을 파일이름에 넣음
+    Loop                                     '무한 반복
+    MsgBox "매크로가 종료되었습니다."        '종료 메시지창 출력
+End Sub
+
+
+
+
+{%endhighlight%}

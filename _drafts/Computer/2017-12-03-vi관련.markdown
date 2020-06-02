@@ -1,0 +1,40 @@
+---
+# layout: "post"
+title: "vi관련"
+date: "2017-12-03 22:07"
+# categories: "Computer"
+tags: "Computer"
+slug: "vi"
+header:
+  teaser: /assets/images/20.png
+---
+
+## vim 관련
+-.vim/vimrc 코드
+
+{% highlight python %}
+
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+"set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+"
+" " let Vundle manage Vundle, required
+
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'vim-airline/vim-airline'
+Plugin 'scrooloose/nerdtree'
+Plugin 'nanotech/jellybeans.vim'
+
+call vundle#end()            " required
+filetype plugin indent on    " required
+
+color jellybeans
+syntax on
+filetype plugin indent on
+map <F3> :NERDTreeToggle<CR>
+
+set number " show line number
+{% endhighlight %}
