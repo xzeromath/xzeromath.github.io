@@ -3,4 +3,5 @@
 - 테마: minimal mistakes 
 - vscode plugins
     - paste image (ctrl+alt+v)
+    - 'assets/contents_images
 - `bundle exec jekyll serve`
